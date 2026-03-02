@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-Future testEndpoint(String endpoint) async{
+Future<String> getClipboard(String endpoint, String conn) async{
   final response = await http.get(
-    Uri.parse(endpoint),
+    Uri.parse("$endpoint$conn"),
     headers: {
       HttpHeaders.contentTypeHeader: 'text/plain'
     }
@@ -12,6 +12,36 @@ Future testEndpoint(String endpoint) async{
   
   if(response.statusCode == 200){
     return response.body;
+  }else{
+    return "Error ${response.statusCode}";
+  }
+}
+
+Future saveClipboard(String endpoint, String conn) async{
+  final response = await http.get(
+    Uri.parse("$endpoint$conn"),
+    headers: {
+      HttpHeaders.contentTypeHeader: 'text/plain'
+    }
+  );
+  
+  if(response.statusCode == 200){
+    return response.body;
+  }else{
+    return "Error ${response.statusCode}";
+  }
+}
+
+Future testEndpoint(String endpoint, String conn) async{
+  final response = await http.get(
+    Uri.parse("$endpoint$conn"),
+    headers: {
+      HttpHeaders.contentTypeHeader: 'text/plain'
+    }
+  );
+  
+  if(response.statusCode == 200){
+    return "ok";
   }else{
     return "Error ${response.statusCode}";
   }
