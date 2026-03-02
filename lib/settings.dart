@@ -74,7 +74,7 @@ class _Settings extends State<Settings> {
                 onPressed: () {
                   setState(() {
                     testEndpointBool = true;
-                    futureData = testEndpoint(textFieldEndpoint.text.trim().isEmpty ? savedEndpoint : textFieldEndpoint.text);
+                    futureData = testEndpoint(textFieldEndpoint.text.trim().isEmpty ? savedEndpoint : textFieldEndpoint.text, "Default");
                   });
                 },
               ),
@@ -114,6 +114,7 @@ class _Settings extends State<Settings> {
                           ),
                         ),
                         onPressed: (){
+                          print("S");
                           saveSettings();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
