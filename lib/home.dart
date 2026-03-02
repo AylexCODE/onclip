@@ -22,23 +22,80 @@ class _HomeState extends State<Home> {
         title: Row(
           spacing: 8.0,
           children: [
-            Text("O"),
-            Text("Connection"),
-            Text("Default"),
-            Text("Connected"),
+            InkWell(
+              onTap: () {
+                print("refresh");
+              },
+              borderRadius: BorderRadius.circular(50),
+              splashColor: Colors.yellowAccent,
+              highlightColor: Colors.yellowAccent,
+              child: CircleAvatar(
+                radius: 8,
+                backgroundColor: Colors.redAccent,
+              ),
+            ),
+            Text("Default", 
+              style: TextStyle(
+                fontSize: 18
+              ),
+            ),
+            Text("Disconected", 
+              style: TextStyle(
+                fontSize: 18
+              ),
+            ),
           ],
         ),
         shape: Border(
           bottom: BorderSide(
             color: Colors.black,
-            width: 1.0
+            width: 2.0
           )
         ),
         actionsPadding: EdgeInsets.only(right: 8.0),
         actions: [
           IconButton(
+            icon: Icon(Icons.copy),
+            color: Colors.black,
+            iconSize: 24,
+            onPressed: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Settings()
+                ),
+              ),
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.paste),
+            color: Colors.black,
+            iconSize: 24,
+            onPressed: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Settings()
+                ),
+              ),
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.save),
+            color: Colors.black,
+            iconSize: 24,
+            onPressed: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Settings()
+                ),
+              ),
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.settings),
-            color: const Color.fromARGB(255, 0, 0, 0),
+            color: Colors.black,
             iconSize: 24,
             onPressed: () => {
               Navigator.push(
@@ -59,7 +116,7 @@ class _HomeState extends State<Home> {
           textAlignVertical: TextAlignVertical.top,
           keyboardType: TextInputType.multiline,
           decoration: InputDecoration(
-            hintText: 'Start Typing...',
+            // hintText: 'Start Typing...',
             border: InputBorder.none,
           ),
         ),
@@ -99,9 +156,14 @@ class _HomeState extends State<Home> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {openDrawer();},
+        onPressed: () {
+          openDrawer();
+        },
         tooltip: 'Add Connection',
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.white,
+        child: Icon(
+          Icons.add
+        ),
       ),
     );
   }
