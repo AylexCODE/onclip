@@ -13,10 +13,22 @@ class _Settings extends State<Settings> {
   TextEditingController textFieldEndpoint = TextEditingController();
 
   bool testEndpointBool = false;
+  String savedEndpoint = "";
+
+  @override
+  void initState() {
+    super.initState();
+    getSavedEndpoint();
+  }
 
   Future<void> saveSettings() async{
     final settings = await SharedPreferences.getInstance();
     settings.setString('endpoint', textFieldEndpoint.text);
+  }
+
+  Future<void> getSavedEndpoint() async{
+    final settings = await SharedPreferences.getInstance();
+    savedEndpoint = settings.getString('endpoint') ?? '';
   }
 
   @override
@@ -62,7 +74,7 @@ class _Settings extends State<Settings> {
                 onPressed: () {
                   setState(() {
                     testEndpointBool = true;
-                    futureData = testEndpoint(textFieldEndpoint.text);
+                    futureData = testEndpoint(textFieldEndpoint.text.trim().isEmpty ? savedEndpoint : textFieldEndpoint.text);
                   });
                 },
               ),
