@@ -13,7 +13,7 @@ Future<String> getClipboard(String endpoint, String conn) async{
   if(response.statusCode == 200){
     return response.body;
   }else{
-    return "Error ${response.statusCode}";
+    throw Exception("Error ${response.statusCode}");
   }
 }
 
@@ -28,7 +28,7 @@ Future saveClipboard(String endpoint, String conn) async{
   if(response.statusCode == 200){
     return response.body;
   }else{
-    return "Error ${response.statusCode}";
+    throw Exception("Error ${response.statusCode}");
   }
 }
 
@@ -43,6 +43,6 @@ Future testEndpoint(String endpoint, String conn) async{
   if(response.statusCode == 200){
     return "ok";
   }else{
-    return "Error ${response.statusCode}";
+    throw Exception("Error ${response.statusCode}");
   }
 }

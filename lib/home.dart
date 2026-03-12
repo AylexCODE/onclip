@@ -14,7 +14,7 @@ class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController clipboard = TextEditingController();
 
-  Future<String>? clipboardData;
+  String clipboardData = "";
 
   String savedEndpoint = "";
   String connectionStatus = "Connecting";
@@ -40,12 +40,26 @@ class _HomeState extends State<Home> {
     getClipboardData(settings.getString("endpoint") ?? '', "Default");
   }
 
-  void getClipboardData(String endpoint, String conn){
+  void getClipboardData(String endpoint, String conn) async{
     setState((){
       connectionStatus = "Connecting";
       connectionIndicator = Colors.orangeAccent;
-      clipboardData = getClipboard(endpoint, conn);
     });
+
+    try{
+      clipboardData = await getClipboard(endpoint, conn);
+      setState(() {
+        connectionStatus = "Connected";
+        connectionIndicator = Colors.green;
+        clipboard.text = clipboardData;
+      });
+    }catch(error){
+      setState(() {
+        connectionStatus = "Disconnected";
+        connectionIndicator = Colors.redAccent;
+        clipboard.text = "";
+      });
+    }
   }
 
   void setConnectionState(){
@@ -73,12 +87,12 @@ class _HomeState extends State<Home> {
             ),
             Text("Default", 
               style: TextStyle(
-                fontSize: 18
+                fontSize: 16
               ),
             ),
             Text(connectionStatus, 
               style: TextStyle(
-                fontSize: 18
+                fontSize: 12
               ),
             ),
           ],
@@ -147,61 +161,28 @@ class _HomeState extends State<Home> {
       ),
       key: scaffoldKey,
       body: Center(
-        child: FutureBuilder(
-          future: clipboardData,
-          builder: (context, snapshot){
-            if(snapshot.hasData){
-              connectionStatus = "Connected";
-              connectionIndicator = Colors.green;
-              clipboard.text = snapshot.data!;
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width, maxWidth: 5000),
-                  child: TextField(
-                    controller: clipboard,
-                    maxLines: null,
-                    expands: true,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Start Typing...',
-                      contentPadding: EdgeInsets.all(8),
-                    ),
-                    autocorrect: false,
-                    onChanged: (value) => {
-                      clipboard.text = value
-                    },
-                  ),
-                ),
-              );
-            }else if(snapshot.hasError){
-              connectionStatus = "Disconnected";
-              connectionIndicator = Colors.redAccent;
-            }
-            
-            return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width, maxWidth: 5000),
-                  child: TextField(
-                    controller: clipboard,
-                    maxLines: null,
-                    expands: true,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Start Typing...',
-                      contentPadding: EdgeInsets.all(8),
-                    ),
-                    autocorrect: false,
-                    onChanged: (value) => {
-                      clipboard.text = value
-                    },
-                  ),
-                ),
-              );
-          },
+        child: SingleChildScrollView(
+          key: PageStorageKey("clipboardWrapper"),
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width, maxWidth: 5000),
+            child: TextField(
+              controller: clipboard,
+              key: ValueKey("clipboardData"),
+              maxLines: null,
+              expands: true,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Start Typing...',
+                contentPadding: EdgeInsets.all(8),
+              ),
+              autocorrect: false,
+              onChanged: (value) => {
+                clipboard.text = value
+              },
+            ),
+          ),
         ),
       ),
       endDrawer: NavigationDrawer(
