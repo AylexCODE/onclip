@@ -114,7 +114,7 @@ class _HomeState extends State<Home> {
     List<String> cons = settings.getStringList("connections") ?? [];
     String trimmedCon = connectionString.length > 5 ? connectionString.substring(0, 5) : connectionString; 
 
-    if(!cons.contains(connectionString)){
+    if(!cons.contains(trimmedCon)){
       cons.add(trimmedCon);
       setState(() {
         addConnectionTextField.text = "";
