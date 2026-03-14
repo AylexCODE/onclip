@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onclip/settings.dart';
 import 'package:onclip/utils/api_request.dart';
-import 'package:onclip/webview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
@@ -243,12 +242,9 @@ class _HomeState extends State<Home> {
               ),
             },
             onLongPress: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => WebView()
-                ),
-              ),
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("404"))
+              )
             },
           ),
         ],
