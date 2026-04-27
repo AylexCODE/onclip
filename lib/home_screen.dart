@@ -617,7 +617,7 @@ class _GlassyFAB extends StatelessWidget {
 
 // ─── PREMIUM CLIPBOARD CARD ──────────────────────────────────────────────────
 
-class _PremiumClipCard extends StatelessWidget {
+class _PremiumClipCard extends StatefulWidget {
   final Map<String, dynamic> data;
   final DocumentReference docRef;
   final bool isOwner;
@@ -631,14 +631,25 @@ class _PremiumClipCard extends StatelessWidget {
   });
 
   @override
+  State<_PremiumClipCard> createState() => _PremiumClipCardState();
+}
+
+class _PremiumClipCardState extends State<_PremiumClipCard> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
-    final bool isPublic = data['isPublic'] ?? false;
-    final String title = data['title'] ?? 'Untitled';
-    final String content = data['content'] ?? '';
-    final String date = data['createdAt'] != null
-        ? (data['createdAt'] as Timestamp).toDate().toString().split(' ')[0]
+    final bool isPublic = widget.data['isPublic'] ?? false;
+    final String title = widget.data['title'] ?? 'Untitled';
+    final String content = widget.data['content'] ?? '';
+    final String date = widget.data['createdAt'] != null
+        ? (widget.data['createdAt'] as Timestamp)
+            .toDate()
+            .toString()
+            .split(' ')[0]
         : 'Saving...';
-    final String username = isOwner ? "" : data['owner'];
+
+    final String username = widget.isOwner ? "" : widget.data['owner'];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -658,233 +669,264 @@ class _PremiumClipCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Header ──────────────────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 12, 0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Visibility badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 9,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isPublic
-                              ? Colors.blue.withValues(alpha: 0.25)
-                              : Colors.white.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isPublic
-                                ? Colors.blue.withValues(alpha: 0.4)
-                                : Colors.white.withValues(alpha: 0.2),
-                            width: 0.6,
+                // ── Tappable header (toggle) ─────────────────────────────────
+                InkWell(
+                  borderRadius: _expanded
+                      ? const BorderRadius.vertical(top: Radius.circular(24))
+                      : BorderRadius.circular(24),
+                  splashColor: Colors.white.withValues(alpha: 0.07),
+                  onTap: () => setState(() => _expanded = !_expanded),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Visibility badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 4,
                           ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isPublic
-                                  ? Icons.public_rounded
-                                  : Icons.lock_outline_rounded,
-                              size: 11,
+                          decoration: BoxDecoration(
+                            color: isPublic
+                                ? Colors.blue.withValues(alpha: 0.25)
+                                : Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
                               color: isPublic
-                                  ? Colors.lightBlueAccent
-                                  : Colors.white60,
+                                  ? Colors.blue.withValues(alpha: 0.4)
+                                  : Colors.white.withValues(alpha: 0.2),
+                              width: 0.6,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              isPublic ? 'Public' : 'Private',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isPublic
+                                    ? Icons.public_rounded
+                                    : Icons.lock_outline_rounded,
+                                size: 11,
                                 color: isPublic
                                     ? Colors.lightBlueAccent
                                     : Colors.white60,
-                                letterSpacing: 0.4,
                               ),
+                              const SizedBox(width: 4),
+                              Text(
+                                isPublic ? 'Public' : 'Private',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: isPublic
+                                      ? Colors.lightBlueAccent
+                                      : Colors.white60,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        // Title (inside tappable row)
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
                             ),
-                          ],
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      // Date chip
-                      Text(
-                        date,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white.withValues(alpha: 0.45),
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      if (!isOwner) ...[
+                        const SizedBox(width: 8),
+                        // Date
                         Text(
-                          " | by: ",
+                          date,
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.45),
-                            letterSpacing: 0.4,
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.4),
                           ),
                         ),
-                        Text(
-                          username,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withValues(alpha: 0.8),
-                            letterSpacing: 0.4,
-                          ),
-                        ),
-                      ],
-                      if (isOwner) ...[
-                        const SizedBox(width: 6),
-                        // Edit button
-                        GestureDetector(
-                          onTap: () => _showEditSheet(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.22),
-                                width: 0.6,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.edit_outlined,
-                              size: 14,
-                              color: Colors.white.withValues(alpha: 0.75),
+                        if (!widget.isOwner) ...[
+                          Text(
+                            " | by: ",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.45),
+                              letterSpacing: 0.4,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        // Delete button
-                        GestureDetector(
-                          onTap: onDelete,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                width: 0.6,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.delete_outline_rounded,
-                              size: 14,
+                          Text(
+                            username,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                               color: Colors.white.withValues(alpha: 0.8),
+                              letterSpacing: 0.4,
                             ),
+                          ),
+                        ],
+                        if (widget.isOwner) ...[
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: () => _showEditSheet(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.22),
+                                  width: 0.6,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.edit_outlined,
+                                size: 14,
+                                color: Colors.white.withValues(alpha: 0.75),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: widget.onDelete,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  width: 0.6,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.delete_outline_rounded,
+                                size: 14,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(width: 6),
+                        // Chevron
+                        AnimatedRotation(
+                          turns: _expanded ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 250),
+                          child: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 20,
+                            color: Colors.white.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
-                    ],
-                  ),
-                ),
-
-                // ── Title ───────────────────────────────────────────────────
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.2,
                     ),
                   ),
                 ),
 
-                // ── Content ─────────────────────────────────────────────────
-                if (content.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                    child: Text(
-                      content,
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.65),
-                        fontSize: 13.5,
-                        height: 1.55,
-                      ),
-                    ),
-                  ),
-
-                // ── Copy action ─────────────────────────────────────────────
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
+                // ── Expandable body ──────────────────────────────────────────
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 250),
+                  crossFadeState: _expanded
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  secondChild: const SizedBox.shrink(),
+                  firstChild: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 0.6,
                         color: Colors.white.withValues(alpha: 0.1),
-                        width: 0.6,
                       ),
-                    ),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(24),
-                      ),
-                      splashColor: Colors.white.withValues(alpha: 0.1),
-                      onTap: () async {
-                        await Clipboard.setData(ClipboardData(text: content));
-                        await HapticFeedback.mediumImpact();
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Row(
+                      if (content.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                          child: Text(
+                            content,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.65),
+                              fontSize: 13.5,
+                              height: 1.55,
+                            ),
+                          ),
+                        ),
+                      // ── Copy action ────────────────────────────────────────
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.1),
+                              width: 0.6,
+                            ),
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(24),
+                            ),
+                            splashColor: Colors.white.withValues(alpha: 0.1),
+                            onTap: () async {
+                              await Clipboard.setData(
+                                  ClipboardData(text: content));
+                              await HapticFeedback.mediumImpact();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Row(
+                                      children: [
+                                        Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text("Copied to clipboard"),
+                                      ],
+                                    ),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: Colors.indigo.shade700,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    margin: const EdgeInsets.all(16),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 13),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    Icons.check_circle_outline_rounded,
-                                    color: Colors.white,
-                                    size: 16,
+                                    Icons.copy_all_rounded,
+                                    size: 15,
+                                    color: Colors.white.withValues(alpha: 0.7),
                                   ),
-                                  SizedBox(width: 8),
-                                  Text("Copied to clipboard"),
+                                  const SizedBox(width: 7),
+                                  Text(
+                                    "TAP TO COPY",
+                                    style: TextStyle(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.7),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.4,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              behavior: SnackBarBehavior.floating,
-                              backgroundColor: Colors.indigo.shade700,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              margin: const EdgeInsets.all(16),
-                              duration: const Duration(seconds: 2),
                             ),
-                          );
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.copy_all_rounded,
-                              size: 15,
-                              color: Colors.white.withValues(alpha: 0.7),
-                            ),
-                            const SizedBox(width: 7),
-                            Text(
-                              "TAP TO COPY",
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.4,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
@@ -896,9 +938,9 @@ class _PremiumClipCard extends StatelessWidget {
   }
 
   void _showEditSheet(BuildContext context) {
-    final titleC = TextEditingController(text: data['title'] ?? '');
-    final contentC = TextEditingController(text: data['content'] ?? '');
-    bool isPublic = data['isPublic'] ?? false;
+    final titleC = TextEditingController(text: widget.data['title'] ?? '');
+    final contentC = TextEditingController(text: widget.data['content'] ?? '');
+    bool isPublic = widget.data['isPublic'] ?? false;
 
     showModalBottomSheet(
       context: context,
@@ -919,9 +961,8 @@ class _PremiumClipCard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(32),
-                ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(32)),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.15),
                   width: 0.8,
@@ -1032,12 +1073,10 @@ class _PremiumClipCard extends StatelessWidget {
                             Switch(
                               value: isPublic,
                               activeThumbColor: Colors.white,
-                              activeTrackColor: Colors.purpleAccent.withValues(
-                                alpha: 0.7,
-                              ),
-                              inactiveTrackColor: Colors.white.withValues(
-                                alpha: 0.15,
-                              ),
+                              activeTrackColor:
+                                  Colors.purpleAccent.withValues(alpha: 0.7),
+                              inactiveTrackColor:
+                                  Colors.white.withValues(alpha: 0.15),
                               inactiveThumbColor: Colors.white60,
                               onChanged: (val) =>
                                   setModalState(() => isPublic = val),
@@ -1062,7 +1101,7 @@ class _PremiumClipCard extends StatelessWidget {
                       ),
                       onPressed: () async {
                         if (titleC.text.trim().isNotEmpty) {
-                          await docRef.update({
+                          await widget.docRef.update({
                             'title': titleC.text.trim(),
                             'content': contentC.text.trim(),
                             'isPublic': isPublic,
